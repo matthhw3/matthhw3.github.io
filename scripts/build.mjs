@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import {renderContent} from './render.mjs';
+const root=new URL('../',import.meta.url);const read=p=>fs.readFileSync(new URL(p,root),'utf8');
+const saved=JSON.parse(read('content.json'));
+const content={...saved,copy:{...JSON.parse(read('defaults.json')),...saved.copy}};
+const html=renderContent(read('template.html'),content,false);
+if(/__(COPY|TAGS|LINK|BLOCKS|OWNER)_/.test(html))throw new Error('Unresolved content fields');
+const out=new URL('_site/',root);fs.rmSync(out,{recursive:true,force:true});fs.mkdirSync(out,{recursive:true});
+fs.cpSync(new URL('assets/',root),out,{recursive:true});fs.cpSync(new URL('photos/',root),new URL('photos/',out),{recursive:true});
+fs.copyFileSync(new URL('photos.json',root),new URL('photos.json',out));fs.writeFileSync(new URL('index.html',out),html);fs.writeFileSync(new URL('.nojekyll',out),'');
+console.log('Built static portfolio in _site');

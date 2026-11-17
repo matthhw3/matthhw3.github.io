@@ -1,8 +1,10 @@
-export const prices={tea:12,ticket:18};
-export function report(entries,filter='all'){
- const seen=new Set();
- const rows=entries.map(([id,o],i)=>{const returning=seen.has(o.customerId);seen.add(o.customerId);const keys=Object.keys(prices).filter(k=>filter==='all'||filter===k);const gross=keys.reduce((s,k)=>s+(o.items[k]||0)*prices[k],0);const refunds=keys.reduce((s,k)=>s+(o.refunds?.[k]||0),0);return {id,label:`Order ${i+1}`,items:o.items,refundsByProduct:o.refunds||{},gross,refunds,net:gross-refunds,returning};}).filter(o=>o.gross>0);
- const gross=rows.reduce((s,o)=>s+o.gross,0),refunds=rows.reduce((s,o)=>s+o.refunds,0),net=gross-refunds,returningNet=rows.filter(o=>o.returning).reduce((s,o)=>s+o.net,0);
- const products=Object.keys(prices).filter(k=>filter==='all'||filter===k).map(key=>{const gross=rows.reduce((s,o)=>s+(o.items[key]||0)*prices[key],0),refunds=rows.reduce((s,o)=>s+(o.refundsByProduct[key]||0),0);return {key,name:key==='tea'?'Tea gift box':'Museum visit',gross,refunds,net:gross-refunds,rate:gross?refunds/gross:0};});
- return {rows,products,gross,refunds,net,returningNet,newNet:net-returningNet,returningShare:net?returningNet/net:0,refundRate:gross?refunds/gross:0};
+import {catalog} from './ginseng-engine.js';
+export function report(workflow,filter='all'){
+ const all=[...workflow.orders.values()];
+ const rows=all.filter(o=>filter==='all'||o.source===filter).map(o=>({...o,gross:catalog[o.sku].price*o.qty,net:catalog[o.sku].price*o.qty-o.refund}));
+ const sum=(list,key)=>list.reduce((s,r)=>s+r[key],0);
+ const products=Object.entries(catalog).filter(([sku])=>filter==='all'||(filter==='ticketing')===(sku==='EVENT-GA')).map(([sku,item])=>{const match=rows.filter(o=>o.sku===sku);return {...item,sku,units:sum(match,'qty'),gross:sum(match,'gross'),refund:sum(match,'refund'),net:sum(match,'net')};});
+ const days=Array.from({length:7},(_,i)=>{const date=`2026-11-0${i+1}`,match=rows.filter(o=>o.date===date);return {day:i+1,shopify:sum(match.filter(o=>o.source==='shopify'),'net'),ticketing:sum(match.filter(o=>o.source==='ticketing'),'net')};});
+ const campaigns=['archive_drop','release_night'].map(campaign=>{const visits=[...workflow.traffic.values()].filter(t=>t.campaign===campaign),match=rows.filter(o=>o.campaign===campaign);return {campaign,clicks:sum(visits,'clicks'),sessions:sum(visits,'sessions'),orders:match.length,net:sum(match,'net')};});
+ return {rows,products,days,campaigns,gross:sum(rows,'gross'),refund:sum(rows,'refund'),net:sum(rows,'net'),units:sum(rows,'qty'),sessions:sum([...workflow.traffic.values()],'sessions')};
 }

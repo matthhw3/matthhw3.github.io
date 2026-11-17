@@ -12,7 +12,7 @@ Create a public repository named `matthhw3.github.io`, upload this folder's cont
 - Résumé: replace `assets/Matthew-Wong-Resume.pdf`.
 - Layout: edit `template.html`; styles and browser scripts are in `assets/`.
 
-GitHub Pages is static hosting, so editing and uploads happen through the repository. No login or backend is required for visitors. All demo transactions and dashboard numbers are fictional and run locally in the visitor's browser.
+GitHub Pages is static hosting, so editing and uploads happen through the repository. No login or backend is required for visitors. All demo transactions and dashboard numbers are fictional and run locally in the visitor's browser. The Ginseng demo combines merchandise orders (Shopify JSON), event ticket sales (CSV), and campaign-tagged website activity. Its source explorer and pipeline ledger show normalization, idempotent batch replay, held-SKU correction, and late-refund reconciliation. Reporting includes design/size sales, daily revenue, and campaign conversion.
 
 ## Preview
 Run `npm run build`, then `python3 -m http.server 8000 --directory _site`. Open http://localhost:8000. No npm dependencies are required.

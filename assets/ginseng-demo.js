@@ -1,5 +1,5 @@
-import {createWorkflow, sampleHistory, nextBatch, sourceNames} from './ginseng-engine.js';
-import {report} from './ginseng-report.js';
+import {createWorkflow, sampleHistory, nextBatch, sourceNames} from './ginseng-engine.js?v=20261117';
+import {report} from './ginseng-report.js?v=20261117';
 const $=id=>document.getElementById(id),root=document.querySelector('.gc');
 const money=cents=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(cents/100);
 const number=value=>value.toLocaleString('en-US');

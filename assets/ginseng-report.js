@@ -1,4 +1,4 @@
-import {catalog} from './ginseng-engine.js';
+import {catalog} from './ginseng-engine.js?v=20261117';
 export function report(workflow,filter='all'){
  const all=[...workflow.orders.values()];
  const rows=all.filter(o=>filter==='all'||o.source===filter).map(o=>({...o,gross:catalog[o.sku].price*o.qty,net:catalog[o.sku].price*o.qty-o.refund}));
